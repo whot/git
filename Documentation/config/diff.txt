@@ -111,6 +111,12 @@ diff.mnemonicPrefix::
 diff.noprefix::
 	If set, 'git diff' does not show any source or destination prefix.
 
+diff.srcprefix::
+	If set, 'git diff' uses this source prefix.
+
+diff.dstprefix::
+	If set, 'git diff' uses this destination prefix.
+
 diff.relative::
 	If set to 'true', 'git diff' does not show changes outside of the directory
 	and show pathnames relative to the current directory.

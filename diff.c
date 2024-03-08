@@ -62,6 +62,8 @@ static const char *diff_order_file_cfg;
 int diff_auto_refresh_index = 1;
 static int diff_mnemonic_prefix;
 static int diff_no_prefix;
+static const char *diff_src_prefix;
+static const char *diff_dst_prefix;
 static int diff_relative;
 static int diff_stat_name_width;
 static int diff_stat_graph_width;
@@ -407,6 +409,12 @@ int git_diff_ui_config(const char *var, const char *value,
 	if (!strcmp(var, "diff.noprefix")) {
 		diff_no_prefix = git_config_bool(var, value);
 		return 0;
+	}
+	if (!strcmp(var, "diff.srcprefix")) {
+		return git_config_string(&diff_src_prefix, var, value);
+	}
+	if (!strcmp(var, "diff.dstprefix")) {
+		return git_config_string(&diff_dst_prefix, var, value);
 	}
 	if (!strcmp(var, "diff.relative")) {
 		diff_relative = git_config_bool(var, value);
@@ -3429,6 +3437,14 @@ void diff_set_default_prefix(struct diff_options *options)
 	options->b_prefix = "b/";
 }
 
+void diff_set_custom_prefix(struct diff_options *options, const char *src_prefix, const char *dst_prefix)
+{
+	if (src_prefix)
+		options->a_prefix = src_prefix;
+	if (dst_prefix)
+		options->b_prefix = dst_prefix;
+}
+
 struct userdiff_driver *get_textconv(struct repository *r,
 				     struct diff_filespec *one)
 {
@@ -4736,6 +4752,8 @@ void repo_diff_setup(struct repository *r, struct diff_options *options)
 		diff_set_noprefix(options);
 	} else if (!diff_mnemonic_prefix) {
 		diff_set_default_prefix(options);
+		if (diff_src_prefix || diff_dst_prefix)
+			diff_set_custom_prefix(options, diff_src_prefix, diff_dst_prefix);
 	}
 
 	options->color_moved = diff_color_moved_default;
